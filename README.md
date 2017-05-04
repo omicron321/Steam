@@ -1,6 +1,9 @@
 # Steam scripts - Various scripts related to Steam.
 
-##dig-store-enhancer.user.js
+## dig-store-enhancer.user.js
+
+![Screenshot](http://i.imgur.com/DrdGLQM.png)
+
 [dig-store-enhancer.user.js](https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js): Add some functionnalities to Steam key store http://www.dailyindiegame.com 
 
 ### Changelog
