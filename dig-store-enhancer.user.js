@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIG Store Enhancer
 // @namespace    https://github.com/Omicron666
-// @version      0.2.0
+// @version      0.2.1
 // @description  Adding some functionnalities to DailyIndieGame store
 // @author       Omicron666
 // @match        http://www.dailyindiegame.com/account_digstore.html
@@ -56,7 +56,7 @@ cursor: pointer;
     let waitingTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
 
 
-    if (/account_digstore|store_update/.test(window.location.href)){
+    if (/account_digstore|store_update.*2/.test(window.location.href)){
 
         $('#TableKeys').addClass('DIG2TableGray');
 
@@ -134,7 +134,7 @@ content: ' \\2261';
         //$('#TableKeys > thead td:contains(Cards)').on('click',function(){$('#TableKeys > tbody > tr:has(td:nth-child(4):empty)').toggle();});
 
     }
-    else if (/account_trades/.test(window.location.href)){
+    else if (/account_trades|store_update/.test(window.location.href)){
         // Main table header: add Steam header
         $('#TableKeys > tbody > tr:first-child').append('<td valign="top" class="DIG2-TitleOrange steam-price-header">Steam</td>');
         // add Steam price on each row
