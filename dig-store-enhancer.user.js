@@ -1,28 +1,29 @@
 // ==UserScript==
 // @name         DIG Store Enhancer
 // @namespace    https://github.com/Omicron666
-// @version      0.2.1
+// @version      0.3.0
 // @description  Adding some functionnalities to DailyIndieGame store
 // @author       Omicron666
-// @match        http://www.dailyindiegame.com/account_digstore.html
-// @match        http://www.dailyindiegame.com/store_update*.html
-// @match        http://www.dailyindiegame.com/account_trades.html
-// @match        http://www.dailyindiegame.com/content_digaccount.html
+// @match        *://*.dailyindiegame.com/*
+// @icon         https://www.dailyindiegame.com/dailyindiegame.png
 // @require      https://code.jquery.com/jquery-3.2.1.min.js
 // @require      https://github.com/Mottie/tablesorter/raw/master/js/jquery.tablesorter.js
-// @resource     faCSS https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css
 // @homepageURL  https://github.com/Omicron666/Steam
 // @supportURL   https://github.com/Omicron666/Steam/issues
 // @downloadURL  https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js
 // @updateURL    https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js
 // @grant        GM_addStyle
-// @grant        GM_getResourceText
 // @grant        GM_xmlhttpRequest
+// @run-at       document-start
 // @connect      store.steampowered.com
 
 // ==/UserScript==
 
-(function() {
+if (/^http\:/.test(window.location.href)){
+    window.location.replace(window.location.href.replace(/http\:/, 'https:'));
+}
+
+$(function() {
     'use strict';
 
     // let's fix style for them...
@@ -53,8 +54,10 @@ content: ' \\21c8';
 cursor: pointer;
 }`);
 
-    let waitingTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
+    // add Font Awesome CSS
+    $("head").append($("<link/>").attr({"rel":"stylesheet","href":"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"}));
 
+    let waitingTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
 
     if (/account_digstore|store_update.*2/.test(window.location.href)){
 
@@ -113,10 +116,6 @@ cursor: pointer;
                                       cssAsc: 'headerSortUp',
                                       cssDesc: 'headerSortDown',
                                       cssHeader: 'headerDefault'});
-
-        // add Font Awesome CSS to head
-        var faCSS = GM_getResourceText("faCSS");
-        GM_addStyle(faCSS);
 
         // Add style for filtering head cell
         GM_addStyle (`
@@ -181,7 +180,7 @@ content: ' \\2261';
         method: "GET",
         url: 'https://store.steampowered.com/api/appdetails?appids='+ appIdList +'&cc=us&filters=price_overview',
         onload: function(xhr) {
-            var data = eval("(" + xhr.responseText + ")"); // because we trust Steam API...
+            var data = JSON.parse(xhr.responseText);
             let $waitingCells = $('.waiting-for-steam-price');
             let $waitingTable = $waitingCells.closest('table');
             $waitingCells.each(function(){
@@ -200,4 +199,4 @@ content: ' \\2261';
 
 
 
-})();
+});
