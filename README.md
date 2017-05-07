@@ -15,7 +15,10 @@
  - All pages with game listings know include full Steam prices for reference
  - Games without Steam price will link to related Steam community hub
  - Ability to dynamically sort by DIG price, Steam price, etc.
-
+ 
+- 0.3.0
+ - Redirect all pages to their secured version (https)
+ 
 ### Known issues :
 - Steam store API returns price of bundle if it is discounted cheaper than the game itself. Possible fix. Low priority bug.
 - No price returned for unique bundle containing single game which don't have a price itself. Possible fix. Low priority bug.
