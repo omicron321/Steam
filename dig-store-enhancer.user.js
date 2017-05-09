@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIG Store Enhancer
 // @namespace    https://github.com/Omicron666
-// @version      0.3.0
+// @version      0.3.1
 // @description  Adding some functionnalities to DailyIndieGame store
 // @author       Omicron666
 // @match        *://*.dailyindiegame.com/*
@@ -127,7 +127,12 @@ content: ' \\2261';
         //$('#TableKeys > thead td:contains(VR), #TableKeys > thead td:contains(Cards), #TableKeys > thead td:contains(Volume)').addClass('filter-out');
         //$('#TableKeys > thead td:contains(Volume)').addClass('filter-out');
         $(':contains(Volume DISCOUNT):last').html("Volume DISCOUNT &#x2261");
-        $('#TableKeys > thead td:contains(Volume)').on('click',function(){$('#TableKeys > tbody > tr:has(td:nth-child(10):not(:contains(Point)))').toggle();});
+        $('#TableKeys > thead td:contains(Volume)').on('click', function(){
+            $('#TableKeys > tbody > tr')
+                .not($('#TableKeys > tbody > tr:has(td:nth-child(9):contains(Point))'))
+                .not($('#TableKeys > tbody > tr:has(td:nth-child(10):contains(Point))'))
+                .not($('#TableKeys > tbody > tr:has(td:nth-child(11):contains(Point))'))
+                .toggle();});
         // FIXME: conflicting multiple toggle
         //$('#TableKeys > thead td:contains(VR)').on('click',function(){$('#TableKeys > tbody > tr:has(td:nth-child(3):empty)').toggle();});
         //$('#TableKeys > thead td:contains(Cards)').on('click',function(){$('#TableKeys > tbody > tr:has(td:nth-child(4):empty)').toggle();});

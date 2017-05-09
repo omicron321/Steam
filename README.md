@@ -4,7 +4,9 @@
 
 ![Screenshot](http://i.imgur.com/DrdGLQM.png)
 
-[dig-store-enhancer.user.js](https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js): Add some functionnalities to Steam key store http://www.dailyindiegame.com 
+Like for any userscripts, you need [TamperMonkey for Google Chrome (and Opera and Chromium) or GreaseMonkey for Firefox](https://github.com/OpenUserJs/OpenUserJS.org/wiki/Userscript-beginners-HOWTO#how-do-i-get-going).
+
+[dig-store-enhancer.user.js](https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js)(click to install): Add some functionalities to Steam key store http://www.dailyindiegame.com 
 
 ### Changelog
 
@@ -25,4 +27,3 @@
 
 ### Coming :
 - Dynamically hide/display games without trading cards or VR.
-
