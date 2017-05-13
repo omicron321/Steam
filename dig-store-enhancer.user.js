@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIG Store Enhancer
 // @namespace    https://github.com/Omicron666
-// @version      0.3.1
+// @version      0.4.0
 // @description  Adding some functionnalities to DailyIndieGame store
 // @author       Omicron666
 // @match        *://*.dailyindiegame.com/*
@@ -36,7 +36,7 @@ padding: 0px;
 spacing: 0px;
 }`);
 
-    // style for sorting
+    // style for sorting + no-wrapping table cells
     GM_addStyle (`
 th:focus, td:focus {outline:none;}
 
@@ -50,14 +50,36 @@ content: ' \\21c8';
 //content: ' \\21c5';
 }
 
-.headerDefault, .headerSortUp, headerSortDown{
-cursor: pointer;
-}`);
+.headerDefault, .headerSortUp, headerSortDown{cursor: pointer;}
+
+td{
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+-o-text-overflow: ellipsis;
+-ms-text-overflow: ellipsis;
+max-width: 200px;
+
+}
+.steam-review {
+max-width: 120px;
+}
+`);
+
+    var appIdList = $('a[href*="store.steampowered.com/app/"]').map(
+        function(i,e){
+            let appid = $(e).prop('href').match(/\d+/);
+            $(e).closest('tr').data('appid', appid); // conveniently store appid on each row
+            return appid;
+        }
+    ).toArray().join();
 
     // add Font Awesome CSS
     $("head").append($("<link/>").attr({"rel":"stylesheet","href":"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"}));
 
-    let waitingTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
+    let waitingPriceTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
+    let waitingScoreTD = '<td class="DIG3_14_Gray steam-review"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-review"></i></>';
+
 
     if (/account_digstore|store_update.*2/.test(window.location.href)){
 
@@ -68,12 +90,11 @@ cursor: pointer;
         $('#sortby').closest('table').insertBefore('#TableKeys');
 
         // Weekly discounts table headers
-        // Two tables with same id: #DIG2TableGray...
         let $weeklyTable = $('td:contains(Weekly discounts):last').closest('table');
-        $weeklyTable.find('tbody > tr:first-child > td').prop('colspan','8');
-        $weeklyTable.find('tbody > tr').eq(1).append('<td valign="top" class="DIG2-TitleOrange steam-price-header">Steam</td>');
+        $weeklyTable.find('tbody > tr:first-child > td').prop('colspan','9');
+        $weeklyTable.find('tbody > tr').eq(1).append('<td valign="top" class="DIG2-TitleOrange steam-price-header">Steam</td><td valign="top" class="DIG2-TitleOrange steam-price-header">Score</td>');
         // Main table header
-        $('#TableKeys > tbody > tr').eq(0).append('<td rowspan="2" valign="top" class="DIG2-TitleOrange steam-price-header">Steam</td>');
+        $('#TableKeys > tbody > tr').eq(0).append('<td rowspan="2" valign="top" class="DIG2-TitleOrange steam-price-header">Steam</td><td rowspan="2" valign="top" class="DIG2-TitleOrange steam-score-header">Score</td>');
 
         // moving rows to proper table headers for sorting...
         $weeklyTable.prepend('<thead />');
@@ -81,12 +102,55 @@ cursor: pointer;
         $weeklyTable.find('thead').append($weeklyTable.find('tbody > tr:first-child')); $weeklyTable.find('thead').append($weeklyTable.find('tbody > tr:first-child'));
         $('#TableKeys').prepend('<thead />');
         // $('#TableKeys > thead').append($('#TableKeys > tbody > tr:lt(2)'));
-        $('#TableKeys > thead').append($('#TableKeys > tbody > tr:first-child')); $('#TableKeys > thead').append($('#TableKeys > tbody > tr:first-child'));
+        $('#TableKeys > thead').append($('#TableKeys > tbody > tr:first-child'));$('#TableKeys > thead').append($('#TableKeys > tbody > tr:first-child'));
         //$('#TableKeys > thead > tr').contents().unwrap().wrap('<th/>');
 
         // display Steam price on each row
-        $weeklyTable.find('tbody > tr').append(waitingTD);
-        $('#TableKeys > tbody > tr').append(waitingTD);
+        $weeklyTable.find('tbody > tr').append(waitingPriceTD);
+        $('#TableKeys > tbody > tr').append(waitingPriceTD);
+
+        // display Steam review score on each row
+        let ReviewScoreUpdateFunc = function(i,e){
+            let $waitingCell = $(waitingScoreTD);
+            let $waitingTable = $waitingCell.closest('table');
+            $(e).append($waitingCell);
+            let appid = $(e).data('appid');
+            // Get Steam review score
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: 'http://store.steampowered.com/appreviews/'+ appid + '?' + $.param({
+                    start_offset:0,
+                    day_range:30, // doesn't seem to be used
+                    filter:'summary',
+                    language:'all',
+                    review_type:'all',
+                    purchase_type:'all',
+                    review_beta_enabled:'0',
+                    l:'english',
+                }),
+
+                onload: function(xhr) {
+                    let data = JSON.parse(xhr.responseText);
+                    let result = '<a href="https://steamcommunity.com/app/'+ appid +'" target="_blank">N/A</a>';
+                    if (data.review_score){
+                        let dataScore = data.review_score;
+                        let stats = /tooltip="(\d+).*?([0-9,]+)/g.exec(data.review_score);
+                        let tooltip = /tooltip="(.*)"/g.exec(data.review_score);
+                        let mostlyString = /tooltip.*>(.*)<\/span>/g.exec(data.review_score);
+                        if ( stats && tooltip && mostlyString)
+                            result = '<span title="'+ tooltip[1] +'">'+ stats[1]+ '% of '+ stats[2]+' ('+ mostlyString[1] +')</span>';
+                    }
+
+                    $waitingCell.html(result);
+                    //$waitingTable.trigger("update");  // refresh sorting
+
+                },
+            });
+
+        };
+
+        $weeklyTable.find('tbody > tr').each(ReviewScoreUpdateFunc);
+        $('#TableKeys > tbody > tr').each(ReviewScoreUpdateFunc);
 
         // bonus
         GM_addStyle ('.feature{}');
@@ -111,8 +175,8 @@ cursor: pointer;
                                   cssAsc: 'headerSortUp',
                                   cssDesc: 'headerSortDown',
                                   cssHeader: 'headerDefault'});
-        $('#TableKeys').tablesorter( {  headers: { 1:{ sorter: false}, 3:{ sorter: false}, 4:{ sorter: false}, 7: {sorter: false},
-                                                  8: {sorter: false}, 10: {sorter: false}, 11: {sorter: false}, 12: {sorter: false}},
+        $('#TableKeys').tablesorter( {  headers: { 7: {sorter: false}, 8: {sorter: false},
+                                                  11: {sorter: false}, 12: {sorter: false}, 13: {sorter: false}},
                                       cssAsc: 'headerSortUp',
                                       cssDesc: 'headerSortDown',
                                       cssHeader: 'headerDefault'});
@@ -127,12 +191,7 @@ content: ' \\2261';
         //$('#TableKeys > thead td:contains(VR), #TableKeys > thead td:contains(Cards), #TableKeys > thead td:contains(Volume)').addClass('filter-out');
         //$('#TableKeys > thead td:contains(Volume)').addClass('filter-out');
         $(':contains(Volume DISCOUNT):last').html("Volume DISCOUNT &#x2261");
-        $('#TableKeys > thead td:contains(Volume)').on('click', function(){
-            $('#TableKeys > tbody > tr')
-                .not($('#TableKeys > tbody > tr:has(td:nth-child(9):contains(Point))'))
-                .not($('#TableKeys > tbody > tr:has(td:nth-child(10):contains(Point))'))
-                .not($('#TableKeys > tbody > tr:has(td:nth-child(11):contains(Point))'))
-                .toggle();});
+        $('#TableKeys > thead td:contains(Volume)').on('click', function(){$('#TableKeys > tbody > tr:not(:has(td:gt(8):contains(Point)))').toggle();});
         // FIXME: conflicting multiple toggle
         //$('#TableKeys > thead td:contains(VR)').on('click',function(){$('#TableKeys > tbody > tr:has(td:nth-child(3):empty)').toggle();});
         //$('#TableKeys > thead td:contains(Cards)').on('click',function(){$('#TableKeys > tbody > tr:has(td:nth-child(4):empty)').toggle();});
@@ -142,7 +201,7 @@ content: ' \\2261';
         // Main table header: add Steam header
         $('#TableKeys > tbody > tr:first-child').append('<td valign="top" class="DIG2-TitleOrange steam-price-header">Steam</td>');
         // add Steam price on each row
-        $('#TableKeys > tbody > tr:not(:first-child)').append(waitingTD);
+        $('#TableKeys > tbody > tr:not(:first-child)').append(waitingPriceTD);
 
         // move table headers for sorting...
         $('#TableKeys').prepend('<thead />');
@@ -157,7 +216,7 @@ content: ' \\2261';
         // Table headers: add Steam header
         $('#TableKeys2 > tbody > tr:first-child, #TableKeys > tbody > tr:first-child').append('<td class="DIG2-TitleOrange steam-price-header">Steam</td>');
         // display Steam price on each row
-        $('#TableKeys2 > tbody > tr:not(:first-child), #TableKeys > tbody > tr:not(:first-child)').append(waitingTD);
+        $('#TableKeys2 > tbody > tr:not(:first-child), #TableKeys > tbody > tr:not(:first-child)').append(waitingPriceTD);
 
         // move table headers for sorting...
         $('#TableKeys').prepend('<thead />');
@@ -173,19 +232,12 @@ content: ' \\2261';
                                       cssHeader: 'headerDefault'});
     }
 
-    var appIdList = $('a[href*="store.steampowered.com/app/"]').map(
-        function(i,e){
-            let appid = $(e).prop('href').match(/\d+/);
-            $(e).closest('tr').data('appid', appid); // conveniently store appid on each row
-            return appid;
-        }
-    ).toArray().join();
-
+    // Get Steam prices
     GM_xmlhttpRequest({
         method: "GET",
         url: 'https://store.steampowered.com/api/appdetails?appids='+ appIdList +'&cc=us&filters=price_overview',
         onload: function(xhr) {
-            var data = JSON.parse(xhr.responseText);
+            let data = JSON.parse(xhr.responseText);
             let $waitingCells = $('.waiting-for-steam-price');
             let $waitingTable = $waitingCells.closest('table');
             $waitingCells.each(function(){
@@ -202,6 +254,8 @@ content: ' \\2261';
         }
     });
 
-
-
+    $( document ).ajaxComplete(function( event, request, settings ) {
+        $( "table" ).trigger('update'); // update sorting wherever needed
+    });
+    
 });
