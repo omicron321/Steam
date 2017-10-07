@@ -243,7 +243,7 @@ content: ' \\2261';
             $waitingCells.each(function(){
                 let appid = $(this).closest('tr').data('appid');
                 let result = "";
-                if (data[appid].success && (data[appid].data !== undefined)  && (data[appid].data.price_overview !== undefined))
+                if ((data[appid] !== undefined && data[appid].data !== undefined && data[appid].success) && (data[appid].data.price_overview !== undefined))
                     result = '$'+ parseInt(data[appid].data.price_overview.initial)/100.0;
                 else
                     result = '<a href="https://steamcommunity.com/app/'+ appid +'" target="_blank">N/A</a>';
