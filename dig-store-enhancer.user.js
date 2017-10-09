@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         DIG Store Enhancer
 // @namespace    https://github.com/ozo2003
-// @version      0.4.0
+// @version      0.4.1
 // @description  Adding some functionnalities to DailyIndieGame store
 // @author       Omicron666
 // @match        *://*.dailyindiegame.com/*
