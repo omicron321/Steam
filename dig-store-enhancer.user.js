@@ -77,7 +77,7 @@ max-width: 120px;
     // add Font Awesome CSS
     $("head").append($("<link/>").attr({"rel":"stylesheet","href":"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"}));
 
-    let waitingPriceTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>
+    let waitingPriceTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
 
     if (/account_digstore|store_update.*2/.test(window.location.href)){
 
