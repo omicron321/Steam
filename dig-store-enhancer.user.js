@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name         DIG Store Enhancer
-// @namespace    https://github.com/Omicron666
+// @namespace    https://github.com/ozo2003
 // @version      0.4.0
 // @description  Adding some functionnalities to DailyIndieGame store
 // @author       Omicron666
@@ -8,10 +8,10 @@
 // @icon         https://www.dailyindiegame.com/dailyindiegame.png
 // @require      https://code.jquery.com/jquery-3.2.1.min.js
 // @require      https://github.com/Mottie/tablesorter/raw/master/js/jquery.tablesorter.js
-// @homepageURL  https://github.com/Omicron666/Steam
-// @supportURL   https://github.com/Omicron666/Steam/issues
-// @downloadURL  https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js
-// @updateURL    https://raw.githubusercontent.com/Omicron666/Steam/master/dig-store-enhancer.user.js
+// @homepageURL  https://github.com/ozo2003/Steam
+// @supportURL   https://github.com/ozo2003/Steam/issues
+// @downloadURL  https://raw.githubusercontent.com/ozo2003/Steam/master/dig-store-enhancer.user.js
+// @updateURL    https://raw.githubusercontent.com/ozo2003/Steam/master/dig-store-enhancer.user.js
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
 // @run-at       document-start
