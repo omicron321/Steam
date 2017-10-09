@@ -77,9 +77,7 @@ max-width: 120px;
     // add Font Awesome CSS
     $("head").append($("<link/>").attr({"rel":"stylesheet","href":"https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"}));
 
-    let waitingPriceTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>';
-    let waitingScoreTD = '<td class="DIG3_14_Gray steam-review"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-review"></i></>';
-
+    let waitingPriceTD = '<td class="DIG3_14_Gray steam-price"><i class="fa fa-refresh fa-spin fa-fw waiting-for-steam-price"></i></>
 
     if (/account_digstore|store_update.*2/.test(window.location.href)){
 
@@ -108,46 +106,6 @@ max-width: 120px;
         // display Steam price on each row
         $weeklyTable.find('tbody > tr').append(waitingPriceTD);
         $('#TableKeys > tbody > tr').append(waitingPriceTD);
-
-        // display Steam review score on each row
-        let ReviewScoreUpdateFunc = function(i,e){
-            let $waitingCell = $(waitingScoreTD);
-            let $waitingTable = $waitingCell.closest('table');
-            $(e).append($waitingCell);
-            let appid = $(e).data('appid');
-            // Get Steam review score
-            GM_xmlhttpRequest({
-                method: "GET",
-                url: 'http://store.steampowered.com/appreviews/'+ appid + '?' + $.param({
-                    start_offset:0,
-                    day_range:30, // doesn't seem to be used
-                    filter:'summary',
-                    language:'all',
-                    review_type:'all',
-                    purchase_type:'all',
-                    review_beta_enabled:'0',
-                    l:'english',
-                }),
-
-                onload: function(xhr) {
-                    let data = JSON.parse(xhr.responseText);
-                    let result = '<a href="https://steamcommunity.com/app/'+ appid +'" target="_blank">N/A</a>';
-                    if (data.review_score){
-                        let dataScore = data.review_score;
-                        let stats = /tooltip="(\d+).*?([0-9,]+)/g.exec(data.review_score);
-                        let tooltip = /tooltip="(.*)"/g.exec(data.review_score);
-                        let mostlyString = /tooltip.*>(.*)<\/span>/g.exec(data.review_score);
-                        if ( stats && tooltip && mostlyString)
-                            result = '<span title="'+ tooltip[1] +'">'+ stats[1]+ '% of '+ stats[2]+' ('+ mostlyString[1] +')</span>';
-                    }
-
-                    $waitingCell.html(result);
-                    //$waitingTable.trigger("update");  // refresh sorting
-
-                },
-            });
-
-        };
 
         $weeklyTable.find('tbody > tr').each(ReviewScoreUpdateFunc);
         $('#TableKeys > tbody > tr').each(ReviewScoreUpdateFunc);
